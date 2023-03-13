@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:article_box/src/features/articles/articles_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'src/di/network_module.dart';
 import 'src/example_screen.dart';
@@ -35,11 +37,22 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       showSemanticsDebugger: false,
       debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData.dark(),
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: _buildTheme(Brightness.dark),
+      home: ArticlesPage(),
+    );
+  }
+
+  ThemeData _buildTheme(brightness) {
+    var baseTheme = ThemeData(
+      primarySwatch: Colors.blue,
+      brightness: brightness,
+      useMaterial3: true,
+    );
+
+    return baseTheme.copyWith(
+      textTheme: GoogleFonts.montserratTextTheme(
+        baseTheme.textTheme,
       ),
-      home: ExampleScreen(),
     );
   }
 }
