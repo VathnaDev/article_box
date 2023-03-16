@@ -48,6 +48,7 @@ dependencies:
   faker: ^2.1.0
   moment_dart: ^0.17.2
   flutter_quill: ^7.0.1
+  reading_time: ^2.0.0
 
 dev_dependencies:
   flutter_test:

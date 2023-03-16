@@ -1,7 +1,9 @@
 import 'package:article_box/src/data/fake_articles.dart';
 import 'package:article_box/src/ext/theme_shortcut.dart';
 import 'package:article_box/src/features/articles/article_detai_page.dart';
+import 'package:article_box/src/features/articles/new_article_page.dart';
 import 'package:article_box/src/util/material_colors_utils.dart';
+import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -20,80 +22,116 @@ class _ArticlesPageState extends State<ArticlesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Article Box"),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.search),
-          )
-        ],
-      ),
-      drawer: Drawer(),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 16,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(onPressed: () {}, child: Text("Featured")),
-                OutlinedButton(onPressed: () {}, child: Text("Articles")),
-                OutlinedButton(onPressed: () {}, child: Text("Videos")),
-                OutlinedButton(onPressed: () {}, child: Text("Tips")),
-              ],
-            ),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {},
-              child: NotificationListener<UserScrollNotification>(
-                onNotification: (UserScrollNotification notification) {
-                  final isScrollDown =
-                      notification.direction == ScrollDirection.forward;
-                  if (isScrollDown != isTabVisible) {
-                    setState(() {
-                      isTabVisible = isScrollDown;
-                    });
-                  }
-                  return true;
-                },
-                child: ListView(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                    top: 8,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Article Box"),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.search),
+            )
+          ],
+        ),
+        drawer: Drawer(
+          child: Column(
+            children: [
+              UserAccountsDrawerHeader(
+                decoration:
+                    BoxDecoration(color: Theme.of(context).colorScheme.surface),
+                accountName: Text("Vathna Vuthy"),
+                accountEmail: Text("vathna.vuthy@wingmoney.com"),
+                currentAccountPicture: ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: Image.network(
+                    Faker().image.image(),
+                    fit: BoxFit.cover,
                   ),
-                  children: [
-                    ...FakeArticle.fakeArticles.map(
-                      (article) => ArticleListItem(
-                        title: article.title,
-                        subTitle: article.getPublishDateAndReadTime(),
-                        content: article.subTitle,
-                        tags: article.tags,
-                        thumbnail: article.thumbnail,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => ArticleDetailPage(
-                                article: article,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.post_add_sharp),
+                title: Text("New Article".toUpperCase()),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await Future.delayed(Duration(milliseconds: 200));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (_) => NewArticlePage(),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+        body: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 16,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(onPressed: () {}, child: Text("Featured")),
+                  OutlinedButton(onPressed: () {}, child: Text("Articles")),
+                  OutlinedButton(onPressed: () {}, child: Text("Videos")),
+                  OutlinedButton(onPressed: () {}, child: Text("Tips")),
+                ],
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {},
+                child: NotificationListener<UserScrollNotification>(
+                  onNotification: (UserScrollNotification notification) {
+                    final isScrollDown =
+                        notification.direction == ScrollDirection.forward;
+                    if (isScrollDown != isTabVisible) {
+                      setState(() {
+                        isTabVisible = isScrollDown;
+                      });
+                    }
+                    return true;
+                  },
+                  child: ListView(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                      top: 8,
+                    ),
+                    children: [
+                      ...FakeArticle.fakeArticles.map(
+                        (article) => ArticleListItem(
+                          title: article.title,
+                          subTitle: article.getPublishDateAndReadTime(),
+                          content: article.subTitle,
+                          tags: article.tags,
+                          thumbnail: article.thumbnail,
+                          useHeroAnimation: true,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                fullscreenDialog: true,
+                                builder: (_) => ArticleDetailPage(
+                                  article: article,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  ],
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -108,8 +146,10 @@ class ArticleListItem extends StatelessWidget {
     this.content = "",
     this.tags = const [],
     this.onTap,
+    this.useHeroAnimation = false,
   });
 
+  bool useHeroAnimation;
   String thumbnail;
   String title;
   String subTitle;
@@ -135,7 +175,7 @@ class ArticleListItem extends StatelessWidget {
               AspectRatio(
                 aspectRatio: 1 / 0.5,
                 child: Hero(
-                  tag: thumbnail,
+                  tag: useHeroAnimation ? thumbnail : Object(),
                   child: Image.network(
                     thumbnail,
                     fit: BoxFit.cover,

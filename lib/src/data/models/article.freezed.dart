@@ -24,7 +24,7 @@ mixin _$Article {
   String get title => throw _privateConstructorUsedError;
   DateTime get publishedDate => throw _privateConstructorUsedError;
   String get subTitle => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
+  List<dynamic> get content => throw _privateConstructorUsedError;
   String get author => throw _privateConstructorUsedError;
   List<String> get tags => throw _privateConstructorUsedError;
 
@@ -43,7 +43,7 @@ abstract class $ArticleCopyWith<$Res> {
       String title,
       DateTime publishedDate,
       String subTitle,
-      String content,
+      List<dynamic> content,
       String author,
       List<String> tags});
 }
@@ -89,7 +89,7 @@ class _$ArticleCopyWithImpl<$Res, $Val extends Article>
       content: null == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
+              as List<dynamic>,
       author: null == author
           ? _value.author
           : author // ignore: cast_nullable_to_non_nullable
@@ -114,7 +114,7 @@ abstract class _$$_ArticleCopyWith<$Res> implements $ArticleCopyWith<$Res> {
       String title,
       DateTime publishedDate,
       String subTitle,
-      String content,
+      List<dynamic> content,
       String author,
       List<String> tags});
 }
@@ -155,9 +155,9 @@ class __$$_ArticleCopyWithImpl<$Res>
           : subTitle // ignore: cast_nullable_to_non_nullable
               as String,
       content: null == content
-          ? _value.content
+          ? _value._content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
+              as List<dynamic>,
       author: null == author
           ? _value.author
           : author // ignore: cast_nullable_to_non_nullable
@@ -178,10 +178,11 @@ class _$_Article extends _Article {
       required this.title,
       required this.publishedDate,
       required this.subTitle,
-      required this.content,
+      required final List<dynamic> content,
       required this.author,
       required final List<String> tags})
-      : _tags = tags,
+      : _content = content,
+        _tags = tags,
         super._();
 
   factory _$_Article.fromJson(Map<String, dynamic> json) =>
@@ -195,8 +196,14 @@ class _$_Article extends _Article {
   final DateTime publishedDate;
   @override
   final String subTitle;
+  final List<dynamic> _content;
   @override
-  final String content;
+  List<dynamic> get content {
+    if (_content is EqualUnmodifiableListView) return _content;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_content);
+  }
+
   @override
   final String author;
   final List<String> _tags;
@@ -224,15 +231,22 @@ class _$_Article extends _Article {
                 other.publishedDate == publishedDate) &&
             (identical(other.subTitle, subTitle) ||
                 other.subTitle == subTitle) &&
-            (identical(other.content, content) || other.content == content) &&
+            const DeepCollectionEquality().equals(other._content, _content) &&
             (identical(other.author, author) || other.author == author) &&
             const DeepCollectionEquality().equals(other._tags, _tags));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, thumbnail, title, publishedDate,
-      subTitle, content, author, const DeepCollectionEquality().hash(_tags));
+  int get hashCode => Object.hash(
+      runtimeType,
+      thumbnail,
+      title,
+      publishedDate,
+      subTitle,
+      const DeepCollectionEquality().hash(_content),
+      author,
+      const DeepCollectionEquality().hash(_tags));
 
   @JsonKey(ignore: true)
   @override
@@ -254,7 +268,7 @@ abstract class _Article extends Article {
       required final String title,
       required final DateTime publishedDate,
       required final String subTitle,
-      required final String content,
+      required final List<dynamic> content,
       required final String author,
       required final List<String> tags}) = _$_Article;
   _Article._() : super._();
@@ -270,7 +284,7 @@ abstract class _Article extends Article {
   @override
   String get subTitle;
   @override
-  String get content;
+  List<dynamic> get content;
   @override
   String get author;
   @override

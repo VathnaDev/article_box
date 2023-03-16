@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:article_box/src/data/models/article.dart';
 import 'package:article_box/src/ext/theme_shortcut.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../data/fake_articles.dart';
+import 'articles_page.dart';
 
 class ArticleDetailPage extends StatefulWidget {
   ArticleDetailPage({
@@ -18,6 +24,18 @@ class ArticleDetailPage extends StatefulWidget {
 }
 
 class _ArticleDetailPageState extends State<ArticleDetailPage> {
+  late quill.QuillController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = quill.QuillController(
+      document: quill.Document.fromJson(widget.article.content),
+      selection: const TextSelection.collapsed(offset: -1),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final article = widget.article;
@@ -40,12 +58,12 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    article.title,
+                    article.title.toUpperCase(),
                     style: context.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontFamily: GoogleFonts.montserrat().fontFamily,
@@ -95,13 +113,61 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                   ),
                   SizedBox(height: 8),
                   Divider(),
-                  Text(
-                    article.content,
-                    style: context.bodyLarge,
+                  quill.QuillEditor(
+                    controller: _controller,
+                    scrollable: false,
+                    scrollController: ScrollController(),
+                    focusNode: FocusNode(),
+                    autoFocus: true,
+                    enableInteractiveSelection: false,
+                    enableSelectionToolbar: false,
+                    readOnly: true,
+                    expands: false,
+                    // **showCursor: controller.isEditEnabled,**
+                    padding: EdgeInsets.zero,
                   ),
+                  SizedBox(height: 28),
+                  Text(
+                    "Related Articles",
+                    style: context.titleLarge,
+                  ),
+                  Divider(),
+                  SizedBox(height: 8),
                 ],
               ),
             ),
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(right: 16),
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ...FakeArticle.fakeArticles.map(
+                    (article) => Container(
+                      margin: const EdgeInsets.only(left: 16),
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: ArticleListItem(
+                        title: article.title,
+                        subTitle: article.getPublishDateAndReadTime(),
+                        content: article.subTitle.substring(0, 50) + " ...",
+                        tags: [],
+                        thumbnail: article.thumbnail,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              fullscreenDialog: true,
+                              builder: (_) => ArticleDetailPage(
+                                article: article,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
           ],
         ),
       ),
